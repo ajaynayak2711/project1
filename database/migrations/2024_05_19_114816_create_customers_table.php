@@ -13,12 +13,13 @@ return new class extends Migration
     {
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('user_id');			
             $table->string('name', 64);
             $table->string('email', 128);
             $table->string('contact', 16);
             $table->text('address');
             $table->tinyInteger('status')->default(1);
+            $table->unsignedInteger('created_by')->nullable(true);
+            $table->unsignedInteger('updated_by')->nullable(true);
             $table->softDeletes();
             $table->timestamps();
         });

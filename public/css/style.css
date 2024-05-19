@@ -1,0 +1,4 @@
+table.dataTable th, table.dataTable td {background: #f8f8f8;}
+.file-box{position:relative;}
+.delete-file{position:absolute;top:-10px;right:-5px;cursor:pointer;color:#dc3545;}
+.delete-icon{cursor:pointer;color:#dc3545;}

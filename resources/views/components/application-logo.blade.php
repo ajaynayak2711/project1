@@ -1,1 +1,1 @@
-<img src="crm-icon.png" style="height:50px" />
+<img src="{{ URL::to('/crm-icon.png') }}" style="height:50px" />
