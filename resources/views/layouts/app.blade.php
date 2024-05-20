@@ -22,6 +22,7 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
+		<x-toast />
         <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
             @include('layouts.navigation')
 
@@ -44,6 +45,39 @@
 		<script src="{!! asset('js/dataTables.min.js') !!}"></script>
 		<script src="{!! asset('js/dataTables.bootstrap5.min.js') !!}"></script>
 		<script src="{!! asset('js/custom.js') !!}"></script>
+		@stack('custom-script')
+		@php
+			$temp = [];
+		@endphp
+
+		@if($errors->any())
+			@php	
+				foreach($errors->getMessages() as $k=>$v)
+					$temp[$k] = implode("<br/>",$v);			
+			@endphp
+		@endif
 		
+		@if(Session::has('success'))
+			<script>
+				toastmsg("{{ Session::get('success') }}");
+			</script>
+		@endif
+
+		@if(Session::has('error'))
+			<script>
+				toastmsg("{{ Session::get('error') }}",true);
+			</script>
+		@endif
+		<script>
+			$(document).ready(function() {
+				var errors = $.parseJSON('{!! json_encode($temp) !!}');
+				formValidation(errors);
+				if($('.is_required').length) {
+					$.each($('.is_required'), function(index, el) {
+						$(this).closest('div').find('label').first().after('<span class="text-danger">*</span>')
+					});
+				}
+			});
+		</script>
     </body>
 </html>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\customer;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\Datatables;
+use App\Traits\CreatedUpdatedBy;
 
 class CustomerController extends Controller
 {
@@ -18,6 +19,8 @@ class CustomerController extends Controller
             'ID' => ['data' => 'DT_RowIndex','name' => 'id', 'searchable' => false],
             "Name" => ["data" =>"name", "name" => "name"],
             'Email' => ['data' => 'email','name' => 'email'],
+            'Contact' => ['data' => 'contact','name' => 'contact'],
+            'Address' => ['data' => 'address','name' => 'address'],
             'Action' => ['data' => 'action', 'orderable' => false, 'searchable' => false]
         ]]);
 
@@ -32,7 +35,6 @@ class CustomerController extends Controller
                 $query->whereDate('created_at', '=', $keyword);
             })
             ->addColumn('action', function($row) {
-				if($row->id != 1)
 					return '<a href="'.route('customer.edit',$row->id).'" class="btn btn-dark">Edit</a> <a data-url="'.route('customer.destroy',$row->id).'" href="javascript:void();" class="btn btn-danger delete-item">Delete</a>';
             })
             ->addColumn('created_at', function($row){
@@ -57,15 +59,15 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(customer $customer)
-    {
-        //
+        $post = $request->all();
+        $validator = $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:customers',
+            'contact' => 'required',
+            'address' => 'required',
+        ]);
+        customer::create($post);
+        return redirect()->to("customer")->with('success', 'Added Successfully');
     }
 
     /**
@@ -73,7 +75,9 @@ class CustomerController extends Controller
      */
     public function edit(customer $customer)
     {
-        //
+        Request()->request->add(['pageTitle'=>"Update Customer", 'pageBtnText'=>"Back", 'pageBtnClass'=>'danger', 'redirectURL'=>route('customer.index')]);
+		$data['customer'] = $customer;
+		return view('customer.edit',$data);
     }
 
     /**
@@ -81,7 +85,16 @@ class CustomerController extends Controller
      */
     public function update(Request $request, customer $customer)
     {
-        //
+		$id = $customer->id;
+        $post = $request->all();
+        $validator = $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:customers,email,'.$id,
+            'contact' => 'required',
+            'address' => 'required',
+        ]);
+		$customer->update($post);
+        return redirect()->to("customer")->with('success', 'Updated Successfully');
     }
 
     /**
@@ -89,6 +102,7 @@ class CustomerController extends Controller
      */
     public function destroy(customer $customer)
     {
-        //
+        $customer->delete();	
+		return response()->json(['message' => 'Deleted Successfully', 'status' => TRUE]);
     }
 }
